@@ -156,7 +156,7 @@ U_01() {
 U_02() {
 	echo ""  >> $resultfile 2>&1
 	echo "▶ US-02(상) | 1. 계정관리 > 1.2 패스워드 복잡성 설정 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : 패스워드 최소길이 8자리 이상, 영문·숫자·특수문자 최소 입력 기능이 설정된 경우"  >> $resultfile 2>&1
+	echo " 양호 판단 기준 : 패스워드 최소길이 9자리 이상, 영문·숫자·특수문자 최소 입력 기능이 설정된 경우"  >> $resultfile 2>&1
 	file_exists_count=0 # 패스워드 설정 파일 존재 시 카운트할 변수
 	minlen_file_exists_count=0 # 패스워드 최소 길이 설정 파일 존재 시 카운트할 변수
 	no_settings_in_minlen_file=0 # 설정 파일 존재하는데, 최소 길이에 대한 설정이 없을 때 카운트할 변수 -> 추후 file_exists_count 변수와 값을 비교하여 동일하면 모든 파일에 패스워드 최소 길이 설정이 없는 것이므로 취약으로 판단함
@@ -171,9 +171,9 @@ U_02() {
 		etc_logindefs_minlen_count=`grep -vE '^#|^\s#' /etc/login.defs  | grep -i 'PASS_MIN_LEN' | awk '{print $2}' | wc -l`
 		if [ $etc_logindefs_minlen_count -gt 0 ]; then
 			etc_logindefs_minlen_value=`grep -vE '^#|^\s#' /etc/login.defs  | grep -i 'PASS_MIN_LEN' | awk '{print $2}'`
-			if [ $etc_logindefs_minlen_value -lt 8 ]; then
+			if [ $etc_logindefs_minlen_value -lt 9 ]; then
 				echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/login.defs 파일에 최소 길이(PASS_MIN_LEN)가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+				echo " /etc/login.defs 파일에 최소 길이(PASS_MIN_LEN)가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 				return 0
 			fi
 		else
@@ -188,11 +188,11 @@ U_02() {
 		etc_security_pwqualityconf_minlen_count=`grep -vE '^#|^\s#' /etc/security/pwquality.conf  | grep -i 'minlen' | wc -l`
 		if [ $etc_security_pwqualityconf_minlen_count -gt 0 ]; then
 			etc_security_pwqualityconf_minlen_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf  | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,2,1)}'`
-			if [ $etc_security_pwqualityconf_minlen_value -lt 8 ]; then
+			if [ $etc_security_pwqualityconf_minlen_value -lt 9 ]; then
 				etc_security_pwqualityconf_minlen_second_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf  | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,3,1)}'`
-				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-9] ]]; then
+				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-8] ]]; then
 					echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 					return 0
 				fi
 			else
@@ -200,12 +200,12 @@ U_02() {
 					etc_pamd_commonpassword_module_count=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'pam_pwquality.so' | wc -l`
 					if [ $etc_pamd_commonpassword_module_count -eq 0 ]; then
 						echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/common-password 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/common-password 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				else
 					echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/common-password 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/common-password 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 					return 0
 				fi
 			fi
@@ -259,11 +259,11 @@ U_02() {
 			etc_pamd_commonpassword_minlen_count=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'minlen' | grep -i ${input_modules[$i]} | wc -l`
 			if [ $etc_pamd_commonpassword_minlen_count -gt 0 ]; then
 				etc_pamd_commonpassword_minlen_value=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'minlen' | grep -i ${input_modules[$i]} | awk '{gsub(" ", "", $0); print}' | awk -F 'minlen' '{print substr($2,2,1)}'`
-				if [ $etc_pamd_commonpassword_minlen_value -lt 8 ]; then
+				if [ $etc_pamd_commonpassword_minlen_value -lt 9 ]; then
 					etc_pamd_commonpassword_minlen_second_value=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'minlen' | grep -i ${input_modules[$i]} | awk '{gsub(" ", "", $0); print}' | awk -F 'minlen' '{print substr($2,3,1)}'`
-					if [[ $etc_pamd_commonpassword_minlen_second_value != [0-9] ]]; then
+					if [[ $etc_pamd_commonpassword_minlen_second_value != [0-8] ]]; then
 						echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/pam.d/common-password 파일에 최소 길이(minlen)가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+						echo " /etc/pam.d/common-password 파일에 최소 길이(minlen)가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				fi
@@ -319,7 +319,7 @@ U_02() {
 U_03() {
 	echo ""  >> $resultfile 2>&1
 	echo "▶ US-03(상) | 1. 계정관리 > 1.3 계정 잠금 임계값 설정 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : 계정 잠금 임계값이 10회 이하의 값으로 설정되어 있는 경우"  >> $resultfile 2>&1
+	echo " 양호 판단 기준 : 계정 잠금 임계값이 5회 이하의 값으로 설정되어 있는 경우"  >> $resultfile 2>&1
 	file_exists_count=0
 	deny_file_exists_count=0
 	no_settings_in_deny_file=0
@@ -338,21 +338,21 @@ U_03() {
 				if [ $etc_pamd_commonauth_deny_value -eq 0 ]; then
 					continue
 				elif [ $etc_pamd_commonauth_deny_value -eq 1 ]; then
-					if [[ $etc_pamd_commonauth_deny_second_value =~ [1-9] ]]; then
+					if [[ $etc_pamd_commonauth_deny_second_value =~ [1-4] ]]; then
 						echo "※ US-03 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/pam.d/common-auth 파일에 계정 잠금 임계값이 11회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+						echo " /etc/pam.d/common-auth 파일에 계정 잠금 임계값이 5회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 						return 0
 					else
-						if [[ $etc_pamd_commonauth_deny_third_value =~ [0-9] ]]; then
+						if [[ $etc_pamd_commonauth_deny_third_value =~ [0-4] ]]; then
 							echo "※ US-03 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-							echo " /etc/pam.d/common-auth 파일에 계정 잠금 임계값이 11회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+							echo " /etc/pam.d/common-auth 파일에 계정 잠금 임계값이 5회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 							return 0
 						fi
 					fi
 				else
-					if [[ $etc_pamd_commonauth_deny_second_value =~ [0-9] ]]; then
+					if [[ $etc_pamd_commonauth_deny_second_value =~ [0-4] ]]; then
 						echo "※ US-03 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/pam.d/common-auth 파일에 계정 잠금 임계값이 11회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+						echo " /etc/pam.d/common-auth 파일에 계정 잠금 임계값이 5회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				fi
@@ -375,21 +375,21 @@ U_03() {
 				if [ $etc_pamd_commonauth_deny_value -eq 0 ]; then
 					continue
 				elif [ $etc_pamd_commonauth_deny_value -eq 1 ]; then
-					if [[ $etc_pamd_commonauth_deny_second_value =~ [1-9] ]]; then
+					if [[ $etc_pamd_commonauth_deny_second_value =~ [1-4] ]]; then
 						echo "※ US-03 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/pam.d/common-password 파일에 계정 잠금 임계값이 11회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+						echo " /etc/pam.d/common-password 파일에 계정 잠금 임계값이 5회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 						return 0
 					else
-						if [[ $etc_pamd_commonauth_deny_third_value =~ [0-9] ]]; then
+						if [[ $etc_pamd_commonauth_deny_third_value =~ [0-4] ]]; then
 							echo "※ US-03 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-							echo " /etc/pam.d/common-password 파일에 계정 잠금 임계값이 11회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+							echo " /etc/pam.d/common-password 파일에 계정 잠금 임계값이 5회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 							return 0
 						fi
 					fi
 				else
-					if [[ $etc_pamd_commonauth_deny_second_value =~ [0-9] ]]; then
+					if [[ $etc_pamd_commonauth_deny_second_value =~ [0-4] ]]; then
 						echo "※ US-03 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/pam.d/common-password 파일에 계정 잠금 임계값이 11회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+						echo " /etc/pam.d/common-password 파일에 계정 잠금 임계값이 5회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				fi
@@ -2121,7 +2121,7 @@ U_45() {
 U_46() {
 	echo ""  >> $resultfile 2>&1
 	echo "▶ US-07(중) | 1. 계정관리 > 1.7 패스워드 최소 길이 설정 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : 패스워드 최소 길이가 8자 이상으로 설정되어 있는 경우" >> $resultfile 2>&1
+	echo " 양호 판단 기준 : 패스워드 최소 길이가 9자 이상으로 설정되어 있는 경우" >> $resultfile 2>&1
 	file_exists_count=0 # 패스워드 설정 파일 존재 시 카운트할 변수
 	minlen_file_exists_count=0 # 패스워드 최소 길이 설정 파일 존재 시 카운트할 변수
 	no_settings_in_minlen_file=0 # 설정 파일 존재하는데, 최소 길이에 대한 설정이 없을 때 카운트할 변수 -> 추후 file_exists_count 변수와 값을 비교하여 동일하면 모든 파일에 패스워드 최소 길이 설정이 없는 것이므로 취약으로 판단함
@@ -2133,9 +2133,9 @@ U_46() {
 		etc_logindefs_minlen_count=`grep -vE '^#|^\s#' /etc/login.defs | grep -i 'PASS_MIN_LEN' | awk '{print $2}' | wc -l`
 		if [ $etc_logindefs_minlen_count -gt 0 ]; then
 			etc_logindefs_minlen_value=`grep -vE '^#|^\s#' /etc/login.defs | grep -i 'PASS_MIN_LEN' | awk '{print $2}'`
-			if [ $etc_logindefs_minlen_value -lt 8 ]; then
+			if [ $etc_logindefs_minlen_value -lt 9 ]; then
 				echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/login.defs 파일에서 패스워드 최소 길이가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+				echo " /etc/login.defs 파일에서 패스워드 최소 길이가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 				return 0
 			fi
 		else
@@ -2149,11 +2149,11 @@ U_46() {
 		etc_security_pwqualityconf_minlen_count=`grep -vE '^#|^\s#' /etc/security/pwquality.conf | grep -i 'minlen' | wc -l`
 		if [ $etc_security_pwqualityconf_minlen_count -gt 0 ]; then
 			etc_security_pwqualityconf_minlen_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,2,1)}'`
-			if [ $etc_security_pwqualityconf_minlen_value -lt 8 ]; then
+			if [ $etc_security_pwqualityconf_minlen_value -lt 9 ]; then
 				etc_security_pwqualityconf_minlen_second_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf  | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,3,1)}'`
-				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-9] ]]; then
+				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-8] ]]; then
 					echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-					echo " /etc/security/pwquality.defs 파일에서 패스워드 최소 길이가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+					echo " /etc/security/pwquality.defs 파일에서 패스워드 최소 길이가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 					return 0
 				fi
 			else
@@ -2161,12 +2161,12 @@ U_46() {
 					etc_pamd_commonpassword_module_count=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'pam_pwquality.so' | wc -l`
 					if [ $etc_pamd_commonpassword_module_count -eq 0 ]; then
 						echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/common-password 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/common-password 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				else
 					echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/common-password 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/common-password 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 					return 0
 				fi
 			fi
@@ -2183,11 +2183,11 @@ U_46() {
 			etc_pamd_commonpassword_minlen_count=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'minlen' | grep -i ${input_modules[$i]} | wc -l`
 			if [ $etc_pamd_commonpassword_minlen_count -gt 0 ]; then
 				etc_pamd_commonpassword_minlen_value=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'minlen' | grep -i ${input_modules[$i]} | awk '{gsub(" ", "", $0); print}'`
-				if [ `echo $etc_pamd_commonpassword_minlen_value | awk -F 'minlen' '{print substr($2,2,1)}'` -lt 8 ]; then
+				if [ `echo $etc_pamd_commonpassword_minlen_value | awk -F 'minlen' '{print substr($2,2,1)}'` -lt 9 ]; then
 					etc_pamd_commonpassword_minlen_second_value=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'minlen' | grep -i ${input_modules[$i]} | awk '{gsub(" ", "", $0); print}' | awk -F 'minlen' '{print substr($2,3,1)}'`
-					if [[ $etc_pamd_commonpassword_minlen_second_value != [0-9] ]]; then
+					if [[ $etc_pamd_commonpassword_minlen_second_value != [0-8] ]]; then
 						echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/pam.d/common-password 파일에서 패스워드 최소 길이가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+						echo " /etc/pam.d/common-password 파일에서 패스워드 최소 길이가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				fi
@@ -2213,14 +2213,14 @@ U_46() {
 U_47() {
 	echo ""  >> $resultfile 2>&1
 	echo "▶ US-08(중) | 1. 계정관리 > 1.8 패스워드 최대 사용기간 설정 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : 패스워드 최대 사용기간이 90일(12주) 이하로 설정되어 있는 경우" >> $resultfile 2>&1
+	echo " 양호 판단 기준 : 패스워드 최대 사용기간이 31일(1개월) 이하로 설정되어 있는 경우" >> $resultfile 2>&1
 	if [ -f /etc/login.defs ]; then
 		etc_logindefs_maxdays_count=`grep -vE '^#|^\s#' /etc/login.defs | grep -i 'PASS_MAX_DAYS' | awk '{print $2}' | wc -l`
 		if [ $etc_logindefs_maxdays_count -gt 0 ]; then
 			etc_logindefs_maxdays_value=`grep -vE '^#|^\s#' /etc/login.defs | grep -i 'PASS_MAX_DAYS' | awk '{print $2}'`
-			if [ $etc_logindefs_maxdays_value -gt 90 ]; then
+			if [ $etc_logindefs_maxdays_value -gt 31 ]; then
 				echo "※ US-08 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/login.defs 파일에 패스워드 최대 사용 기간이 91일 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+				echo " /etc/login.defs 파일에 패스워드 최대 사용 기간이 31일 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 				return 0
 			else
 				echo "※ US-08 결과 : 양호(Good)" >> $resultfile 2>&1
@@ -2357,7 +2357,7 @@ U_53() {
 U_54() {
 	echo ""  >> $resultfile 2>&1
 	echo "▶ US-15(하) | 1. 계정관리 > 1.15 Session Timeout 설정 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : Session Timeout이 600초(10분) 이하로 설정되어 있는 경우" >> $resultfile 2>&1
+	echo " 양호 판단 기준 : Session Timeout이 300초(5분) 이하로 설정되어 있는 경우" >> $resultfile 2>&1
 	file_exists_count=0 # 세션 타임아웃 설정 파일 존재 시 카운트할 변수
 	no_tmout_setting_file=0 # 설정 파일 존재하는데, 세션 타임아웃 설정이 없을 때 카운트할 변수 -> 추후 file_exists_count 변수와 값을 비교하여 동일하면 모든 파일에 세션 타임아웃 설정이 없는 것이므로 취약으로 판단함
 	# /etc/profile 파일 내 세션 타임아웃 설정 확인함
@@ -2366,9 +2366,9 @@ U_54() {
 		etc_profile_tmout_count=`grep -vE '^#|^\s#' /etc/profile | grep -i 'TMOUT' | awk -F = '{gsub(" ", "", $0); print $2}' | wc -l`
 		if [ $etc_profile_tmout_count -gt 0 ]; then
 			etc_profile_tmout_value=`grep -vE '^#|^\s#' /etc/profile | grep -i 'TMOUT' | awk -F = '{gsub(" ", "", $0); print $2}'`
-			if [ $etc_profile_tmout_value -gt 600 ]; then
+			if [ $etc_profile_tmout_value -gt 300 ]; then
 				echo "※ US-15 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/profile 파일에 세션 타임아웃이 600초 이하로 설정되지 않았습니다." >> $resultfile 2>&1
+				echo " /etc/profile 파일에 세션 타임아웃이 300초 이하로 설정되지 않았습니다." >> $resultfile 2>&1
 				return 0
 			fi
 		else
@@ -2389,9 +2389,9 @@ U_54() {
 			user_homedirectory_profile_tmout_count=`grep -vE '^#|^\s#' ${user_homedirectory_path[$i]}/.profile | grep -i 'TMOUT' | awk -F = '{gsub(" ", "", $0); print $2}' | wc -l`
 			if [ $user_homedirectory_profile_tmout_count -gt 0 ]; then
 				user_homedirectory_profile_tmout_value=`grep -vE '^#|^\s#' ${user_homedirectory_path[$i]}/.profile | grep -i 'TMOUT' | awk -F = '{gsub(" ", "", $0); print $2}'`
-				if [ $user_homedirectory_profile_tmout_value -gt 600 ]; then
+				if [ $user_homedirectory_profile_tmout_value -gt 300 ]; then
 					echo "※ US-15 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-					echo " ${user_homedirectory_path[$i]}/.profile 파일에 세션 타임아웃이 600초 이하로 설정되지 않았습니다." >> $resultfile 2>&1
+					echo " ${user_homedirectory_path[$i]}/.profile 파일에 세션 타임아웃이 300초 이하로 설정되지 않았습니다." >> $resultfile 2>&1
 					return 0
 				fi
 			else
@@ -2405,9 +2405,9 @@ U_54() {
 		etc_cshlogin_tmout_count=`grep -vE '^#|^\s#' /etc/csh.login | grep -i 'set' | grep -i 'autologout' | awk -F = '{gsub(" ", "", $0); print $2}' | wc -l`
 		if [ $etc_cshlogin_tmout_count -gt 0 ]; then
 			etc_cshlogin_tmout_value=`grep -vE '^#|^\s#' /etc/csh.login | grep -i 'set' | grep -i 'autologout' | awk -F = '{gsub(" ", "", $0); print $2}'`
-			if [ $etc_cshlogin_tmout_value -gt 10 ]; then
+			if [ $etc_cshlogin_tmout_value -gt 5 ]; then
 				echo "※ US-15 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/csh.login 파일에 세션 타임아웃이 10분 이하로 설정되지 않았습니다." >> $resultfile 2>&1
+				echo " /etc/csh.login 파일에 세션 타임아웃이 5분 이하로 설정되지 않았습니다." >> $resultfile 2>&1
 				return 0
 			fi
 		else
@@ -2418,11 +2418,11 @@ U_54() {
 	if [ -f /etc/csh.cshrc ]; then
 		((file_exists_count++))
 		etc_cshrc_tmout_count=`grep -vE '^#|^\s#' /etc/csh.cshrc | grep -i 'set' | grep -i 'autologout' | awk -F = '{gsub(" ", "", $0); print $2}' | wc -l`
-		if [ $etc_cshrc_tmout_count -gt 10 ]; then
+		if [ $etc_cshrc_tmout_count -gt 5 ]; then
 			etc_cshrc_tmout_value=`grep -vE '^#|^\s#' /etc/csh.cshrc | grep -i 'set' | grep -i 'autologout' | awk -F = '{gsub(" ", "", $0); print $2}'`
-			if [ $etc_cshrc_tmout_value -gt 10 ]; then
+			if [ $etc_cshrc_tmout_value -gt 5 ]; then
 				echo "※ US-15 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/csh.cshrc 파일에 세션 타임아웃이 10분 이하로 설정되지 않았습니다." >> $resultfile 2>&1
+				echo " /etc/csh.cshrc 파일에 세션 타임아웃이 5분 이하로 설정되지 않았습니다." >> $resultfile 2>&1
 				return 0
 			fi
 		else
