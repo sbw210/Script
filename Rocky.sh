@@ -156,7 +156,7 @@ US_01() {
 U_02() {
 	echo ""  >> $resultfile 2>&1
 	echo "▶ US-02(상) | 1. 계정관리 > 1.2 비밀번호 복잡성 설정 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : 패스워드 최소길이 8자리 이상, 영문·숫자·특수문자 최소 입력 기능이 설정된 경우"  >> $resultfile 2>&1
+	echo " 양호 판단 기준 : 패스워드 최소길이 9자리 이상, 영문·숫자·특수문자 최소 입력 기능이 설정된 경우"  >> $resultfile 2>&1
 	file_exists_count=0 # 패스워드 설정 파일 존재 시 카운트할 변수
 	minlen_file_exists_count=0 # 패스워드 최소 길이 설정 파일 존재 시 카운트할 변수
 	no_settings_in_minlen_file=0 # 설정 파일 존재하는데, 최소 길이에 대한 설정이 없을 때 카운트할 변수 -> 추후 file_exists_count 변수와 값을 비교하여 동일하면 모든 파일에 패스워드 최소 길이 설정이 없는 것이므로 취약으로 판단함
@@ -171,9 +171,9 @@ U_02() {
 		etc_logindefs_minlen_count=`grep -vE '^#|^\s#' /etc/login.defs | grep -i 'PASS_MIN_LEN' | awk '{print $2}' | wc -l`
 		if [ $etc_logindefs_minlen_count -gt 0 ]; then
 		etc_logindefs_minlen_value=`grep -vE '^#|^\s#' /etc/login.defs | grep -i 'PASS_MIN_LEN' | awk '{print $2}'`
-			if [ $etc_logindefs_minlen_value -lt 8 ]; then
+			if [ $etc_logindefs_minlen_value -lt 9 ]; then
 				echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/login.defs 파일에 최소 길이(PASS_MIN_LEN)가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+				echo " /etc/login.defs 파일에 최소 길이(PASS_MIN_LEN)가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 				return 0
 			fi
 		else
@@ -193,11 +193,11 @@ U_02() {
 				pw_settings_file_minlen_count=`grep -vE '^#|^\s#' ${pw_settings_files[$i]} | grep -i 'minlen' | grep -i ${input_modules[$j]} | wc -l`
 				if [ $pw_settings_file_minlen_count -gt 0 ]; then
 					pw_settings_file_minlen_value=`grep -vE '^#|^\s#' ${pw_settings_files[$i]} | grep -i 'minlen' | grep -i ${input_modules[$j]} | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,2,1)}'`
-					if [ $pw_settings_file_minlen_value -lt 8 ]; then
+					if [ $pw_settings_file_minlen_value -lt 9 ]; then
 						pw_settings_file_minlen_second_value=`grep -vE '^#|^\s#' ${pw_settings_files[$i]} | grep -i 'minlen' | grep -i ${input_modules[$j]} | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,3,1)}'`
-						if [[ $pw_settings_file_minlen_second_value != [0-9] ]]; then
+						if [[ $pw_settings_file_minlen_second_value != [0-10] ]]; then
 							echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-							echo " ${pw_settings_files[$i]} 파일에 최소 길이(minlen)가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+							echo " ${pw_settings_files[$i]} 파일에 최소 길이(minlen)가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 							return 0
 						fi
 					fi
@@ -241,11 +241,11 @@ U_02() {
 		etc_security_pwqualityconf_minlen_count=`grep -vE '^#|^\s#' /etc/security/pwquality.conf | grep -i 'minlen' | wc -l`
 		if [ $etc_security_pwqualityconf_minlen_count -gt 0 ]; then
 			etc_security_pwqualityconf_minlen_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,2,1)}'`
-			if [ $etc_security_pwqualityconf_minlen_value -lt 8 ]; then
+			if [ $etc_security_pwqualityconf_minlen_value -lt 9 ]; then
 				etc_security_pwqualityconf_minlen_second_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,3,1)}'`
-				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-9] ]]; then
+				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-10] ]]; then
 					echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 					return 0
 				fi
 			else
@@ -254,26 +254,26 @@ U_02() {
 					etc_pamd_passwordauth_module_count=`grep -vE '^#|^\s#' /etc/pam.d/password-auth | grep -i 'pam_pwquality.so' | wc -l`
 					if [ $etc_pamd_systemauth_module_count -eq 0 ] && [ $etc_pamd_passwordauth_module_count -eq 0 ]; then
 						echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/system-auth 또는 /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/system-auth 또는 /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				elif [ -f /etc/pam.d/system-auth ]; then
 					etc_pamd_systemauth_module_count=`grep -vE '^#|^\s#' /etc/pam.d/system-auth | grep -i 'pam_pwquality.so' | wc -l`
 					if [ $etc_pamd_systemauth_module_count -eq 0 ]; then
 						echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/system-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/system-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				elif [ -f /etc/pam.d/password-auth ]; then
 					etc_pamd_passwordauth_module_count=`grep -vE '^#|^\s#' /etc/pam.d/password-auth | grep -i 'pam_pwquality.so' | wc -l`
 					if [ $etc_pamd_passwordauth_module_count -eq 0 ]; then
 						echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				else
 					echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/system-auth 또는 /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/system-auth 또는 /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 					return 0
 				fi
 			fi
@@ -352,7 +352,7 @@ U_02() {
 U_03() {
 	echo ""  >> $resultfile 2>&1
 	echo "▶ US-03(상) | 1. 계정관리 > 1.3 계정 잠금 임계값 설정 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : 계정 잠금 임계값이 10회 이하의 값으로 설정되어 있는 경우"  >> $resultfile 2>&1
+	echo " 양호 판단 기준 : 계정 잠금 임계값이 5회 이하의 값으로 설정되어 있는 경우"  >> $resultfile 2>&1
 	file_exists_count=0
 	deny_file_exists_count=0
 	no_settings_in_deny_file=0
@@ -374,21 +374,21 @@ U_03() {
 					if [ $deny_settings_file_deny_value -eq 0 ]; then
 						continue
 					elif [ $deny_settings_file_deny_value -eq 1 ]; then
-						if [[ $deny_settings_file_deny_second_value =~ [1-9] ]]; then
+						if [[ $deny_settings_file_deny_second_value =~ [1-4] ]]; then
 							echo "※ US-03 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-							echo " ${deny_settings_files[$i]} 파일에 계정 잠금 임계값이 11회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+							echo " ${deny_settings_files[$i]} 파일에 계정 잠금 임계값이 5회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 							return 0
 						else
-							if [[ $deny_settings_file_deny_third_value =~ [0-9] ]]; then
+							if [[ $deny_settings_file_deny_third_value =~ [0-4] ]]; then
 								echo "※ US-03 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-								echo " ${deny_settings_files[$i]} 파일에 계정 잠금 임계값이 11회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+								echo " ${deny_settings_files[$i]} 파일에 계정 잠금 임계값이 5회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 								return 0
 							fi
 						fi
 					else
 						if [[ $deny_settings_file_deny_second_value =~ [0-9] ]]; then
 							echo "※ US-03 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-							echo " ${deny_settings_files[$i]} 파일에 계정 잠금 임계값이 11회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+							echo " ${deny_settings_files[$i]} 파일에 계정 잠금 임계값이 5회 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 							return 0
 						fi
 					fi
@@ -2167,7 +2167,7 @@ U_45() {
 U_46() {
 	echo ""  >> $resultfile 2>&1
 	echo "▶ US-07(중) | 1. 계정관리 > 1.7 패스워드 최소 길이 설정 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : 패스워드 최소 길이가 8자 이상으로 설정되어 있는 경우" >> $resultfile 2>&1
+	echo " 양호 판단 기준 : 패스워드 최소 길이가 9자 이상으로 설정되어 있는 경우" >> $resultfile 2>&1
 	file_exists_count=0
 	minlen_file_exists_count=0
 	no_settings_in_minlen_file=0
@@ -2179,9 +2179,9 @@ U_46() {
 		etc_logindefs_minlen_count=`grep -vE '^#|^\s#' /etc/login.defs | grep -i 'PASS_MIN_LEN' | awk '{print $2}' | wc -l`
 		if [ $etc_logindefs_minlen_count -gt 0 ]; then
 			etc_logindefs_minlen_value=`grep -vE '^#|^\s#' /etc/login.defs | grep -i 'PASS_MIN_LEN' | awk '{print $2}'`
-			if [ $etc_logindefs_minlen_value -lt 8 ]; then
+			if [ $etc_logindefs_minlen_value -lt 9 ]; then
 				echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/login.defs 파일에 패스워드 최소 길이가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+				echo " /etc/login.defs 파일에 패스워드 최소 길이가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 				return 0
 			fi
 		else
@@ -2200,11 +2200,11 @@ U_46() {
 				pw_settings_file_minlen_count=`grep -vE '^#|^\s#' ${minlen_settings_files[$i]} | grep -i 'minlen' | grep -i ${input_modules[$j]} | wc -l`
 				if [ $pw_settings_file_minlen_count -gt 0 ]; then
 					pw_settings_file_minlen_value=`grep -vE '^#|^\s#' ${minlen_settings_files[$i]} | grep -i 'minlen' | grep -i ${input_modules[$j]} | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,2,1)}'`
-					if [ $pw_settings_file_minlen_value -lt 8 ]; then
+					if [ $pw_settings_file_minlen_value -lt 9 ]; then
 						pw_settings_file_minlen_second_value=`grep -vE '^#|^\s#' ${pw_settings_files[$i]} | grep -i 'minlen' | grep -i ${input_modules[$j]} | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,3,1)}'`
-						if [[ $pw_settings_file_minlen_second_value != [0-9] ]]; then
+						if [[ $pw_settings_file_minlen_second_value != [0-10] ]]; then
 							echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-							echo " ${minlen_settings_files[$i]} 파일에 패스워드 최소 길이가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+							echo " ${minlen_settings_files[$i]} 파일에 패스워드 최소 길이가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 							return 0
 						fi
 					fi
@@ -2221,11 +2221,11 @@ U_46() {
 		etc_security_pwqualityconf_minlen_count=`grep -vE '^#|^\s#' /etc/security/pwquality.conf | grep -i 'minlen' | wc -l`
 		if [ $etc_security_pwqualityconf_minlen_count -gt 0 ]; then
 			etc_security_pwqualityconf_minlen_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,2,1)}'`
-			if [ $etc_security_pwqualityconf_minlen_value -lt 8 ]; then
+			if [ $etc_security_pwqualityconf_minlen_value -lt 9 ]; then
 				etc_security_pwqualityconf_minlen_second_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf  | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,3,1)}'`
-				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-9] ]]; then
+				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-10] ]]; then
 					echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-					echo " /etc/security/pwquality.defs 파일에서 패스워드 최소 길이가 8 미만으로 설정되어 있습니다." >> $resultfile 2>&1
+					echo " /etc/security/pwquality.defs 파일에서 패스워드 최소 길이가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 					return 0
 				fi
 			else
@@ -2234,26 +2234,26 @@ U_46() {
 					etc_pamd_passwordauth_module_count=`grep -vE '^#|^\s#' /etc/pam.d/password-auth | grep -i 'pam_pwquality.so' | wc -l`
 					if [ $etc_pamd_systemauth_module_count -eq 0 ] && [ $etc_pamd_passwordauth_module_count -eq 0 ]; then
 						echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/system-auth 또는 /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/system-auth 또는 /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				elif [ -f /etc/pam.d/system-auth ]; then
 					etc_pamd_systemauth_module_count=`grep -vE '^#|^\s#' /etc/pam.d/system-auth | grep -i 'pam_pwquality.so' | wc -l`
 					if [ $etc_pamd_systemauth_module_count -eq 0 ]; then
 						echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/system-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/system-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				elif [ -f /etc/pam.d/password-auth ]; then
 					etc_pamd_passwordauth_module_count=`grep -vE '^#|^\s#' /etc/pam.d/password-auth | grep -i 'pam_pwquality.so' | wc -l`
 					if [ $etc_pamd_passwordauth_module_count -eq 0 ]; then
 						echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+						echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 						return 0
 					fi
 				else
 					echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 8 이상으로 설정하고, /etc/pam.d/system-auth 또는 /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
+					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)를 9 이상으로 설정하고, /etc/pam.d/system-auth 또는 /etc/pam.d/password-auth 파일에 pam_pwquality.so 모듈을 추가하지 않았습니다." >> $resultfile 2>&1
 					return 0
 				fi
 			fi
