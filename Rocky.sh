@@ -155,7 +155,7 @@ U_01() {
 
 U_02() {
 	echo ""  >> $resultfile 2>&1
-	echo "▶ U-02(상) | 1. 계정관리 > 1.2 패스워드 복잡성 설정 ◀"  >> $resultfile 2>&1
+	echo "▶ U-02(상) | 1. 계정관리 > 1.2 비밀번호 복잡성 설정 ◀"  >> $resultfile 2>&1
 	echo " 양호 판단 기준 : 패스워드 최소길이 8자리 이상, 영문·숫자·특수문자 최소 입력 기능이 설정된 경우"  >> $resultfile 2>&1
 	file_exists_count=0 # 패스워드 설정 파일 존재 시 카운트할 변수
 	minlen_file_exists_count=0 # 패스워드 최소 길이 설정 파일 존재 시 카운트할 변수
@@ -413,7 +413,7 @@ U_03() {
 
 U_04() {
 	echo ""  >> $resultfile 2>&1
-	echo "▶ U-04(상) | 1. 계정관리 > 1.4 패스워드 파일 보호 ◀"  >> $resultfile 2>&1
+	echo "▶ U-04(상) | 1. 계정관리 > 1.4 비밀번호 암호화 ◀"  >> $resultfile 2>&1
 	echo " 양호 판단 기준 : 쉐도우 패스워드를 사용하거나, 패스워드를 암호화하여 저장하는 경우"  >> $resultfile 2>&1
 	if [ `awk -F : '$2!="x"' /etc/passwd | wc -l` -gt 0 ]; then
 		echo "※ U-04 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
@@ -2278,14 +2278,14 @@ U_46() {
 U_47() {
 	echo ""  >> $resultfile 2>&1
 	echo "▶ U-47(중) | 1. 계정관리 > 1.8 패스워드 최대 사용기간 설정 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : 패스워드 최대 사용기간이 90일(12주) 이하로 설정되어 있는 경우" >> $resultfile 2>&1
+	echo " 양호 판단 기준 : 패스워드 최대 사용기간이 31일 (1개월) 이하로 설정되어 있는 경우" >> $resultfile 2>&1
 	if [ -f /etc/login.defs ]; then
 		etc_logindefs_maxdays_count=`grep -vE '^#|^\s#' /etc/login.defs | grep -i 'PASS_MAX_DAYS' | awk '{print $2}' | wc -l`
 		if [ $etc_logindefs_maxdays_count -gt 0 ]; then
 			etc_logindefs_maxdays_value=`grep -vE '^#|^\s#' /etc/login.defs | grep -i 'PASS_MAX_DAYS' | awk '{print $2}'`
-			if [ $etc_logindefs_maxdays_value -gt 90 ]; then
+			if [ $etc_logindefs_maxdays_value -gt 31 ]; then
 				echo "※ U-47 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/login.defs 파일에 패스워드 최대 사용 기간이 91일 이상으로 설정되어 있습니다." >> $resultfile 2>&1
+				echo " /etc/login.defs 파일에 패스워드 최대 사용 기간이 31일 이상으로 설정되어 있습니다." >> $resultfile 2>&1
 				return 0
 			else
 				echo "※ U-47 결과 : 양호(Good)" >> $resultfile 2>&1
@@ -2422,7 +2422,7 @@ U_53() {
 U_54() {
 	echo ""  >> $resultfile 2>&1
 	echo "▶ U-54(하) | 1. 계정관리 > 1.15 Session Timeout 설정 ◀"  >> $resultfile 2>&1
-	echo " 양호 판단 기준 : Session Timeout이 600초(10분) 이하로 설정되어 있는 경우" >> $resultfile 2>&1
+	echo " 양호 판단 기준 : Session Timeout이 300초(5분) 이하로 설정되어 있는 경우" >> $resultfile 2>&1
 	file_exists_count=0 # 세션 타임아웃 설정 파일 존재 시 카운트할 변수
 	no_tmout_setting_file=0 # 설정 파일 존재하는데, 세션 타임아웃 설정이 없을 때 카운트할 변수 -> 추후 file_exists_count 변수와 값을 비교하여 동일하면 모든 파일에 세션 타임아웃 설정이 없는 것이므로 취약으로 판단함
 	# /etc/profile 파일 내 세션 타임아웃 설정 확인함
@@ -2431,9 +2431,9 @@ U_54() {
 		etc_profile_tmout_count=`grep -vE '^#|^\s#' /etc/profile | grep -i 'TMOUT' | awk -F = '{gsub(" ", "", $0); print $2}' | wc -l`
 		if [ $etc_profile_tmout_count -gt 0 ]; then
 			etc_profile_tmout_value=`grep -vE '^#|^\s#' /etc/profile | grep -i 'TMOUT' | awk -F = '{gsub(" ", "", $0); print $2}'`
-			if [ $etc_profile_tmout_value -gt 600 ]; then
+			if [ $etc_profile_tmout_value -gt 300 ]; then
 				echo "※ U-54 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/profile 파일에 세션 타임아웃이 600초 이하로 설정되지 않았습니다." >> $resultfile 2>&1
+				echo " /etc/profile 파일에 세션 타임아웃이 300초 이하로 설정되지 않았습니다." >> $resultfile 2>&1
 				return 0
 			fi
 		else
@@ -2454,9 +2454,9 @@ U_54() {
 			user_homedirectory_profile_tmout_count=`grep -vE '^#|^\s#' ${user_homedirectory_path[$i]}/.profile | grep -i 'TMOUT' | awk -F = '{gsub(" ", "", $0); print $2}' | wc -l`
 			if [ $user_homedirectory_profile_tmout_count -gt 0 ]; then
 				user_homedirectory_profile_tmout_value=`grep -vE '^#|^\s#' ${user_homedirectory_path[$i]}/.profile | grep -i 'TMOUT' | awk -F = '{gsub(" ", "", $0); print $2}'`
-				if [ $user_homedirectory_profile_tmout_value -gt 600 ]; then
+				if [ $user_homedirectory_profile_tmout_value -gt 300 ]; then
 					echo "※ U-54 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-					echo " ${user_homedirectory_path[$i]}/.profile 파일에 세션 타임아웃이 600초 이하로 설정되지 않았습니다." >> $resultfile 2>&1
+					echo " ${user_homedirectory_path[$i]}/.profile 파일에 세션 타임아웃이 300초 이하로 설정되지 않았습니다." >> $resultfile 2>&1
 					return 0
 				fi
 			else
@@ -2470,9 +2470,9 @@ U_54() {
 		etc_cshlogin_tmout_count=`grep -vE '^#|^\s#' /etc/csh.login | grep -i 'set' | grep -i 'autologout' | awk -F = '{gsub(" ", "", $0); print $2}' | wc -l`
 		if [ $etc_cshlogin_tmout_count -gt 0 ]; then
 			etc_cshlogin_tmout_value=`grep -vE '^#|^\s#' /etc/csh.login | grep -i 'set' | grep -i 'autologout' | awk -F = '{gsub(" ", "", $0); print $2}'`
-			if [ $etc_cshlogin_tmout_value -gt 10 ]; then
+			if [ $etc_cshlogin_tmout_value -gt 5 ]; then
 				echo "※ U-54 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/csh.login 파일에 세션 타임아웃이 10분 이하로 설정되지 않았습니다." >> $resultfile 2>&1
+				echo " /etc/csh.login 파일에 세션 타임아웃이 5분 이하로 설정되지 않았습니다." >> $resultfile 2>&1
 				return 0
 			fi
 		else
@@ -2485,9 +2485,9 @@ U_54() {
 		etc_cshrc_tmout_count=`grep -vE '^#|^\s#' /etc/csh.cshrc | grep -i 'set' | grep -i 'autologout' | awk -F = '{gsub(" ", "", $0); print $2}' | wc -l`
 		if [ $etc_cshrc_tmout_count -gt 10 ]; then
 			etc_cshrc_tmout_value=`grep -vE '^#|^\s#' /etc/csh.cshrc | grep -i 'set' | grep -i 'autologout' | awk -F = '{gsub(" ", "", $0); print $2}'`
-			if [ $etc_cshrc_tmout_value -gt 10 ]; then
+			if [ $etc_cshrc_tmout_value -gt 5 ]; then
 				echo "※ U-54 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
-				echo " /etc/csh.cshrc 파일에 세션 타임아웃이 10분 이하로 설정되지 않았습니다." >> $resultfile 2>&1
+				echo " /etc/csh.cshrc 파일에 세션 타임아웃이 5분 이하로 설정되지 않았습니다." >> $resultfile 2>&1
 				return 0
 			fi
 		else
