@@ -190,7 +190,7 @@ U_02() {
 			etc_security_pwqualityconf_minlen_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf  | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,2,1)}'`
 			if [ $etc_security_pwqualityconf_minlen_value -lt 9 ]; then
 				etc_security_pwqualityconf_minlen_second_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf  | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,3,1)}'`
-				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-8] ]]; then
+				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-10] ]]; then
 					echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
 					echo " /etc/security/pwquality.conf 파일에 최소 길이(minlen)가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 					return 0
@@ -261,7 +261,7 @@ U_02() {
 				etc_pamd_commonpassword_minlen_value=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'minlen' | grep -i ${input_modules[$i]} | awk '{gsub(" ", "", $0); print}' | awk -F 'minlen' '{print substr($2,2,1)}'`
 				if [ $etc_pamd_commonpassword_minlen_value -lt 9 ]; then
 					etc_pamd_commonpassword_minlen_second_value=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'minlen' | grep -i ${input_modules[$i]} | awk '{gsub(" ", "", $0); print}' | awk -F 'minlen' '{print substr($2,3,1)}'`
-					if [[ $etc_pamd_commonpassword_minlen_second_value != [0-8] ]]; then
+					if [[ $etc_pamd_commonpassword_minlen_second_value != [0-10] ]]; then
 						echo "※ US-02 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
 						echo " /etc/pam.d/common-password 파일에 최소 길이(minlen)가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 						return 0
@@ -2151,7 +2151,7 @@ U_46() {
 			etc_security_pwqualityconf_minlen_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,2,1)}'`
 			if [ $etc_security_pwqualityconf_minlen_value -lt 9 ]; then
 				etc_security_pwqualityconf_minlen_second_value=`grep -vE '^#|^\s#' /etc/security/pwquality.conf  | grep -i 'minlen' | awk -F 'minlen' '{gsub(" ", "", $0); print substr($2,3,1)}'`
-				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-8] ]]; then
+				if [[ $etc_security_pwqualityconf_minlen_second_value != [0-10] ]]; then
 					echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
 					echo " /etc/security/pwquality.defs 파일에서 패스워드 최소 길이가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 					return 0
@@ -2185,7 +2185,7 @@ U_46() {
 				etc_pamd_commonpassword_minlen_value=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'minlen' | grep -i ${input_modules[$i]} | awk '{gsub(" ", "", $0); print}'`
 				if [ `echo $etc_pamd_commonpassword_minlen_value | awk -F 'minlen' '{print substr($2,2,1)}'` -lt 9 ]; then
 					etc_pamd_commonpassword_minlen_second_value=`grep -vE '^#|^\s#' /etc/pam.d/common-password | grep -i 'minlen' | grep -i ${input_modules[$i]} | awk '{gsub(" ", "", $0); print}' | awk -F 'minlen' '{print substr($2,3,1)}'`
-					if [[ $etc_pamd_commonpassword_minlen_second_value != [0-8] ]]; then
+					if [[ $etc_pamd_commonpassword_minlen_second_value != [0-10] ]]; then
 						echo "※ US-07 결과 : 취약(Vulnerable)" >> $resultfile 2>&1
 						echo " /etc/pam.d/common-password 파일에서 패스워드 최소 길이가 9 미만으로 설정되어 있습니다." >> $resultfile 2>&1
 						return 0
